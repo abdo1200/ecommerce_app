@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ecommerce_app/models/product.dart';
-import 'package:ecommerce_app/widgets/DynamicColorPicker.dart';
-import 'package:ecommerce_app/widgets/textfielddynamic.dart';
+import 'package:ecommerce_app/widgets/Add_Product/DynamicColorPicker.dart';
+import 'package:ecommerce_app/widgets/Add_Product/textfielddynamic.dart';
 import 'package:flutter/material.dart';
 
 class Custom_Provider extends ChangeNotifier {
@@ -10,6 +10,9 @@ class Custom_Provider extends ChangeNotifier {
   String CategoryValue;
 
   List<TextFieldDynamic> sizelistDynamic = [];
+
+  List Selectedcolors = [];
+  String Selectesize;
 
   addcolorpicker() {
     listDynamic.add(new ColorBickerDynamic());
@@ -52,13 +55,16 @@ class Custom_Provider extends ChangeNotifier {
           doc.reference.update({
             "colors." + key: true,
           });
+          Selectedcolors.add(key);
         } else {
           doc.reference.update({
             "colors." + key: false,
           });
+          Selectedcolors.remove(key);
         }
       });
     }
+
     notifyListeners();
   }
 
@@ -68,13 +74,26 @@ class Custom_Provider extends ChangeNotifier {
     if (snapshot.docs.isNotEmpty) {
       snapshot.docs.forEach((doc) {
         if (selectvalue == false) {
+          Map<String, dynamic> data = doc.data();
+          if (data['sizes'].containsValue(true)) {
+            Map<String, dynamic> sizes = data['sizes'];
+            sizes.forEach((keydata, value) {
+              if (value == true && keydata != key) {
+                doc.reference.update({
+                  "sizes." + keydata: false,
+                });
+              }
+            });
+          }
           doc.reference.update({
             "sizes." + key: true,
           });
+          Selectesize = key;
         } else {
           doc.reference.update({
             "sizes." + key: false,
           });
+          Selectesize = '';
         }
       });
     }
@@ -84,13 +103,34 @@ class Custom_Provider extends ChangeNotifier {
   addToFavorites(String email, List productList, String productName) async {
     if (productList.contains(productName)) {
       productList.remove(productName);
-      await _db.collection('users').doc(email).set({
+      await _db.collection('users').doc(email).update({
         'favouriteproducts': productList,
       });
     } else {
       productList.add(productName);
-      await _db.collection('users').doc(email).set({
+      await _db.collection('users').doc(email).update({
         'favouriteproducts': productList,
+      });
+    }
+  }
+
+  addToCart(
+      {email, Map<String, dynamic> productList, productName, price}) async {
+    if (productList.containsKey(productName)) {
+      productList.remove(productName);
+      await _db.collection('users').doc(email).update({
+        'Cart': productList,
+      });
+    } else {
+      productList.addAll({
+        productName: {
+          'price': price,
+          'colors': Selectedcolors,
+          'size': Selectesize
+        }
+      });
+      await _db.collection('users').doc(email).update({
+        'Cart': productList,
       });
     }
   }

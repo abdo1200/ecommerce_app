@@ -44,7 +44,7 @@ class FavoriteButton extends StatelessWidget {
                   .snapshots(),
               builder: (_, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return CircularProgressIndicator();
+                  return Container();
                 }
                 var item = snapshot.data ?? [];
                 return GestureDetector(

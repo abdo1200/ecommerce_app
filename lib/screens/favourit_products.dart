@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:ecommerce_app/models/product.dart';
 import 'package:ecommerce_app/providers/auth_provider.dart';
 import 'package:ecommerce_app/providers/cutsom_provider.dart';
 import 'package:ecommerce_app/screens/product_details.dart';
@@ -56,6 +57,17 @@ class FavouritProducts extends StatelessWidget {
                                   .map((DocumentSnapshot document) {
                                 Map<String, dynamic> data =
                                     document.data() as Map<String, dynamic>;
+                                Product productData = new Product();
+
+                                productData = Product(
+                                  description: data['description'],
+                                  name: data['name'],
+                                  image: data['image'],
+                                  price: data['price'],
+                                  colors: data['colors'],
+                                  sizes: data['sizes'],
+                                  category: data['category'],
+                                );
                                 return GestureDetector(
                                   onTap: () {
                                     Navigator.push(
@@ -63,7 +75,7 @@ class FavouritProducts extends StatelessWidget {
                                         MaterialPageRoute(
                                             builder: (context) =>
                                                 ProductDetails(
-                                                    data: data['name'])));
+                                                    productData: productData)));
                                   },
                                   child: Container(
                                       width: MediaQuery.of(context).size.width -

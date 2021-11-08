@@ -53,7 +53,7 @@ class MultiDataStreamBuilder extends StatelessWidget {
                       context,
                       MaterialPageRoute(
                           builder: (context) =>
-                              ProductDetails(data: productData)));
+                              ProductDetails(productData: productData)));
                 },
                 child: Container(
                     width: MediaQuery.of(context).size.width - 40,
@@ -133,9 +133,10 @@ class MultiDataStreamBuilder extends StatelessWidget {
                                       return GestureDetector(
                                         onTap: () {
                                           CustomProvider.addToFavorites(
-                                              authProvider.userdata.email,
-                                              item['favouriteproducts'],
-                                              data['name']);
+                                            authProvider.userdata.email,
+                                            item['favouriteproducts'],
+                                            data['name'],
+                                          );
                                         },
                                         child: item['favouriteproducts']
                                                 .contains(data['name'])

@@ -27,7 +27,7 @@ class TopSalesList extends StatelessWidget {
                   context,
                   MaterialPageRoute(
                       builder: (context) =>
-                          ProductDetails(data: products[index])));
+                          ProductDetails(productData: products[index])));
             },
             child: Stack(
               children: [
@@ -94,9 +94,10 @@ class TopSalesList extends StatelessWidget {
                           return GestureDetector(
                             onTap: () {
                               CustomProvider.addToFavorites(
-                                  authProvider.userdata.email,
-                                  item['favouriteproducts'],
-                                  products[index].name);
+                                authProvider.userdata.email,
+                                item['favouriteproducts'],
+                                products[index].name,
+                              );
                             },
                             child: item['favouriteproducts']
                                     .contains(products[index].name)

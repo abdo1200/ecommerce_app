@@ -3,8 +3,8 @@ import 'package:ecommerce_app/providers/auth_provider.dart';
 import 'package:ecommerce_app/providers/cutsom_provider.dart';
 import 'package:ecommerce_app/providers/image_provider.dart';
 import 'package:ecommerce_app/screens/product_details.dart';
-import 'package:ecommerce_app/widgets/CustomGridView.dart';
-import 'package:ecommerce_app/widgets/DropDown.dart';
+import 'package:ecommerce_app/widgets/Add_Product/CustomGridView.dart';
+import 'package:ecommerce_app/widgets/Add_Product/DropDown.dart';
 import 'package:ecommerce_app/widgets/custom_button.dart';
 import 'package:ecommerce_app/widgets/search_textfield.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -231,7 +231,7 @@ class AddProduct extends StatelessWidget {
                             context,
                             MaterialPageRoute(
                                 builder: (context) =>
-                                    ProductDetails(data: productData)));
+                                    ProductDetails(productData: productData)));
                       },
                       btncolor: Colors.red,
                       text: 'Add Product',

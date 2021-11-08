@@ -3,8 +3,8 @@
 //* product details
 //* redefine color and size in product to map 
 //*add to favorite
-//!streambuilder on lists only in product details
-//!add to cart
+//*streambuilder on lists only in product details
+//*add to cart
 //!payment
 //!profile buttons 
 //!sale section in home
@@ -12,4 +12,5 @@
 //!search function
 //!button snackbar
 //!if no product make something say that
-//!permisson to choose one size
+//!Cart button in every page
+//*permisson to choose one size
