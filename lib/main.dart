@@ -15,6 +15,7 @@ void main() async {
   SystemChrome.setEnabledSystemUIOverlays([SystemUiOverlay.top]);
   await Firebase.initializeApp();
   final FirestoreService _db = FirestoreService();
+  final auth_provider auth = auth_provider();
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider(create: (context) => auth_provider()),
@@ -23,7 +24,10 @@ void main() async {
       ChangeNotifierProvider(create: (context) => FirebaseProvider()),
       ChangeNotifierProvider(create: (context) => Custom_Provider()),
       StreamProvider(create: (context) => _db.getCategories()),
-      StreamProvider(create: (context) => _db.getopsalesproducts())
+      StreamProvider(create: (context) => _db.getopsalesproducts()),
+      //FutureProvider(create: (context) => auth.GetUser())
+
+      //StreamProvider(create: (context) => _db.getcartLength()),
     ],
     child: MyApp(),
   ));

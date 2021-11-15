@@ -21,6 +21,7 @@ class SizesList extends StatelessWidget {
           }
           var items = snapshot.data?.docs ?? [];
           var data = items[0];
+          customProvider.Selectesize = '';
           return Container(
             child: Padding(
               padding: const EdgeInsets.only(left: 30, right: 20),
@@ -44,13 +45,17 @@ class SizesList extends StatelessWidget {
                     width: 20,
                   ),
                   Container(
-                    height: 86,
+                    height: 113,
+                    width: 220,
                     child: ListView.builder(
                       shrinkWrap: true,
                       scrollDirection: Axis.horizontal,
                       itemCount: data['sizes'].length,
                       itemBuilder: (context, index) {
                         String key = data['sizes'].keys.elementAt(index);
+                        if (data['sizes'][key] == true) {
+                          customProvider.Selectesize = key;
+                        }
                         return Row(
                           children: [
                             GestureDetector(

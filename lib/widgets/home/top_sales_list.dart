@@ -1,21 +1,24 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ecommerce_app/models/category.dart';
 import 'package:ecommerce_app/models/product.dart';
+import 'package:ecommerce_app/models/user.dart';
 import 'package:ecommerce_app/providers/auth_provider.dart';
 import 'package:ecommerce_app/providers/cutsom_provider.dart';
 import 'package:ecommerce_app/screens/product_details.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:provider/provider.dart';
 
 class TopSalesList extends StatelessWidget {
+  User user = FirebaseAuth.instance.currentUser;
   @override
   Widget build(BuildContext context) {
     var products = Provider.of<List<Product>>(context);
     var CustomProvider = Provider.of<Custom_Provider>(context);
     var authProvider = Provider.of<auth_provider>(context);
     return Container(
-      height: 200,
+      height: 220,
       child: ListView.builder(
         shrinkWrap: true,
         scrollDirection: Axis.horizontal,
@@ -83,7 +86,7 @@ class TopSalesList extends StatelessWidget {
                       StreamBuilder(
                         stream: FirebaseFirestore.instance
                             .collection('users')
-                            .doc(authProvider.userdata.email)
+                            .doc(user?.email)
                             .snapshots(),
                         builder: (_, snapshot) {
                           if (snapshot.connectionState ==
@@ -91,15 +94,20 @@ class TopSalesList extends StatelessWidget {
                             return CircularProgressIndicator();
                           }
                           var item = snapshot.data ?? [];
+                          Map<String, dynamic> data = item.data();
+                          List favoriteProducts = [];
+                          if (data.containsKey('favouriteproducts')) {
+                            favoriteProducts = item['favouriteproducts'];
+                          }
                           return GestureDetector(
                             onTap: () {
                               CustomProvider.addToFavorites(
-                                authProvider.userdata.email,
-                                item['favouriteproducts'],
+                                user.email,
+                                favoriteProducts,
                                 products[index].name,
                               );
                             },
-                            child: item['favouriteproducts']
+                            child: favoriteProducts
                                     .contains(products[index].name)
                                 ? Container(
                                     padding: EdgeInsets.all(10),

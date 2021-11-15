@@ -1,8 +1,9 @@
 import 'dart:core';
 
-class user_model{
+class user_model {
   final String email;
-  final String id;
+  final String name;
+  final String image;
 
-  user_model({this.email, this.id});
+  user_model({this.email, this.name, this.image});
 }

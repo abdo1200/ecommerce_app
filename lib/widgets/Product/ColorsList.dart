@@ -21,6 +21,7 @@ class ColorList extends StatelessWidget {
           }
           var items = snapshot.data?.docs ?? [];
           var data = items[0];
+          customProvider.Selectedcolors.clear();
           return Container(
             child: Container(
                 margin: EdgeInsets.only(left: 20),
@@ -50,6 +51,7 @@ class ColorList extends StatelessWidget {
                           children: [
                             Container(
                               height: 60,
+                              width: 220,
                               child: ListView.builder(
                                 shrinkWrap: true,
                                 scrollDirection: Axis.horizontal,
@@ -57,6 +59,9 @@ class ColorList extends StatelessWidget {
                                 itemBuilder: (context, index) {
                                   String key =
                                       data['colors'].keys.elementAt(index);
+                                  if (data['colors'][key] == true) {
+                                    customProvider.Selectedcolors.add(key);
+                                  }
                                   return Row(
                                     children: [
                                       GestureDetector(

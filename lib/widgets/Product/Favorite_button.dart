@@ -1,13 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ecommerce_app/providers/auth_provider.dart';
 import 'package:ecommerce_app/providers/cutsom_provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class FavoriteButton extends StatelessWidget {
   final String name;
-
-  const FavoriteButton(this.name);
+  User user = FirebaseAuth.instance.currentUser;
+  FavoriteButton(this.name);
 
   @override
   Widget build(BuildContext context) {
@@ -40,19 +41,24 @@ class FavoriteButton extends StatelessWidget {
             child: StreamBuilder(
               stream: FirebaseFirestore.instance
                   .collection('users')
-                  .doc(authProvider.userdata.email)
+                  .doc(user.email)
                   .snapshots(),
               builder: (_, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return Container();
                 }
                 var item = snapshot.data ?? [];
+                Map<String, dynamic> data = item.data();
+                List favoriteProducts = [];
+                if (data.containsKey('favouriteproducts')) {
+                  favoriteProducts = item['favouriteproducts'];
+                }
                 return GestureDetector(
                   onTap: () {
-                    CustomProvider.addToFavorites(authProvider.userdata.email,
-                        item['favouriteproducts'], name);
+                    CustomProvider.addToFavorites(
+                        user.email, favoriteProducts, name);
                   },
-                  child: item['favouriteproducts'].contains(name)
+                  child: favoriteProducts.contains(name)
                       ? Container(
                           margin: EdgeInsets.only(right: 30),
                           padding: EdgeInsets.all(10),

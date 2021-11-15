@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:ui';
 
 class ProductHeader extends StatelessWidget {
   final String image;
@@ -7,16 +8,25 @@ class ProductHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 400,
+      height: MediaQuery.of(context).size.height * 1 / 3 + 100,
       width: double.infinity,
       child: Stack(
         children: [
+          ImageFiltered(
+            imageFilter: ImageFilter.blur(sigmaX: 3, sigmaY: 3),
+            child: Container(
+              width: double.infinity,
+              child: Image.network(
+                image,
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
           Container(
-            height: 400,
+            height: 300,
             width: double.infinity,
             child: Image.network(
               image,
-              fit: BoxFit.cover,
             ),
           ),
           Container(

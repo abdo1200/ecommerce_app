@@ -1,11 +1,13 @@
-import 'package:ecommerce_app/providers/auth_provider.dart';
+import 'package:ecommerce_app/providers/cutsom_provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class ProfileHeader extends StatelessWidget {
+  User user = FirebaseAuth.instance.currentUser;
   @override
   Widget build(BuildContext context) {
-    var authprovider= Provider.of<auth_provider>(context);
+    var provider = Provider.of<Custom_Provider>(context);
     return Container(
       width: double.infinity,
       height: 250,
@@ -17,9 +19,7 @@ class ProfileHeader extends StatelessWidget {
                 color: Colors.red,
                 borderRadius: BorderRadius.only(
                     bottomLeft: Radius.circular(50),
-                    bottomRight: Radius.circular(50)
-                )
-            ),
+                    bottomRight: Radius.circular(50))),
           ),
           Align(
             alignment: Alignment.bottomCenter,
@@ -34,28 +34,51 @@ class ProfileHeader extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    Icon(Icons.exit_to_app,size: 30,color: Colors.white,)
+                    Icon(
+                      Icons.exit_to_app,
+                      size: 30,
+                      color: Colors.white,
+                    )
                   ],
                 ),
               ),
-              SizedBox(height: 35,),
-              Container(
-                decoration: BoxDecoration(
-                    boxShadow: [
-                      BoxShadow(color: Colors.black,blurRadius: 5,spreadRadius: .1)
-                    ],
-                    borderRadius: BorderRadius.circular(50)
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(100),
-                  child: Image.network(authprovider.userdata.photoURL),
-                ),
+              SizedBox(
+                height: 35,
               ),
-              SizedBox(height: 10,),
-              Text(authprovider.userdata.displayName,style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold
-              ),)
+              Column(
+                children: [
+                  Container(
+                    decoration: BoxDecoration(boxShadow: [
+                      BoxShadow(
+                          color: Colors.black, blurRadius: 5, spreadRadius: .1)
+                    ], borderRadius: BorderRadius.circular(50)),
+                    child: (user.photoURL != null)
+                        ? Container(
+                            height: 100,
+                            width: 100,
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(100),
+                              child: Image.network(
+                                user.photoURL,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          )
+                        : Icon(
+                            Icons.person,
+                            color: Colors.white,
+                            size: 100,
+                          ),
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Text(
+                    user.displayName,
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
             ],
           )
         ],

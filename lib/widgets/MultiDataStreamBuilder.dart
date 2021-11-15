@@ -3,6 +3,7 @@ import 'package:ecommerce_app/models/product.dart';
 import 'package:ecommerce_app/providers/auth_provider.dart';
 import 'package:ecommerce_app/providers/cutsom_provider.dart';
 import 'package:ecommerce_app/screens/product_details.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -10,17 +11,17 @@ import 'package:provider/provider.dart';
 class MultiDataStreamBuilder extends StatelessWidget {
   String categoryName;
   MultiDataStreamBuilder({this.categoryName});
+  User user = FirebaseAuth.instance.currentUser;
 
   @override
   Widget build(BuildContext context) {
-    var authProvider = Provider.of<auth_provider>(context);
     var CustomProvider = Provider.of<Custom_Provider>(context);
     Stream<QuerySnapshot> _ProductsStream = FirebaseFirestore.instance
         .collection('Products')
         .where('category', isEqualTo: categoryName)
         .snapshots();
     return Container(
-      padding: EdgeInsets.all(20),
+      height: MediaQuery.of(context).size.height - 60,
       child: StreamBuilder<QuerySnapshot>(
         stream: _ProductsStream,
         builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -56,8 +57,8 @@ class MultiDataStreamBuilder extends StatelessWidget {
                               ProductDetails(productData: productData)));
                 },
                 child: Container(
-                    width: MediaQuery.of(context).size.width - 40,
-                    margin: EdgeInsets.only(top: 30),
+                    margin: EdgeInsets.only(
+                        top: 15, bottom: 15, left: 20, right: 20),
                     decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(20),
@@ -70,7 +71,7 @@ class MultiDataStreamBuilder extends StatelessWidget {
                     child: Row(
                       children: [
                         Container(
-                          width: MediaQuery.of(context).size.width / 2,
+                          width: MediaQuery.of(context).size.width / 2 - 40,
                           height: 200,
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(20),
@@ -122,7 +123,7 @@ class MultiDataStreamBuilder extends StatelessWidget {
                                   StreamBuilder(
                                     stream: FirebaseFirestore.instance
                                         .collection('users')
-                                        .doc(authProvider.userdata.email)
+                                        .doc(user.email)
                                         .snapshots(),
                                     builder: (_, snapshot) {
                                       if (snapshot.connectionState ==
@@ -130,15 +131,24 @@ class MultiDataStreamBuilder extends StatelessWidget {
                                         return CircularProgressIndicator();
                                       }
                                       var item = snapshot.data ?? [];
+                                      Map<String, dynamic> favdata =
+                                          item.data();
+                                      List favoriteProducts = [];
+                                      if (favdata
+                                          .containsKey('favouriteproducts')) {
+                                        favoriteProducts =
+                                            item['favouriteproducts'];
+                                      }
+
                                       return GestureDetector(
                                         onTap: () {
                                           CustomProvider.addToFavorites(
-                                            authProvider.userdata.email,
-                                            item['favouriteproducts'],
+                                            user.email,
+                                            favoriteProducts,
                                             data['name'],
                                           );
                                         },
-                                        child: item['favouriteproducts']
+                                        child: favoriteProducts
                                                 .contains(data['name'])
                                             ? Container(
                                                 margin:

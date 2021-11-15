@@ -24,7 +24,6 @@ class CategoriesSlide extends StatelessWidget {
                       builder: (context) => CategoryProducts(
                             CategoryName: categories[index].name,
                           )));
-              print(categories[index].name);
             },
             child: Stack(
               children: [

@@ -2,17 +2,22 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ecommerce_app/models/product.dart';
 import 'package:ecommerce_app/widgets/Add_Product/DynamicColorPicker.dart';
 import 'package:ecommerce_app/widgets/Add_Product/textfielddynamic.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class Custom_Provider extends ChangeNotifier {
   FirebaseFirestore _db = FirebaseFirestore.instance;
+  int CartLenght;
   List<ColorBickerDynamic> listDynamic = [];
   String CategoryValue;
+  bool editMode = false;
+  User user = FirebaseAuth.instance.currentUser;
 
   List<TextFieldDynamic> sizelistDynamic = [];
+  double cartTotal = 0.0;
 
   List Selectedcolors = [];
-  String Selectesize;
+  String Selectesize = '';
 
   addcolorpicker() {
     listDynamic.add(new ColorBickerDynamic());
@@ -55,12 +60,10 @@ class Custom_Provider extends ChangeNotifier {
           doc.reference.update({
             "colors." + key: true,
           });
-          Selectedcolors.add(key);
         } else {
           doc.reference.update({
             "colors." + key: false,
           });
-          Selectedcolors.remove(key);
         }
       });
     }
@@ -88,12 +91,10 @@ class Custom_Provider extends ChangeNotifier {
           doc.reference.update({
             "sizes." + key: true,
           });
-          Selectesize = key;
         } else {
           doc.reference.update({
             "sizes." + key: false,
           });
-          Selectesize = '';
         }
       });
     }
@@ -115,7 +116,11 @@ class Custom_Provider extends ChangeNotifier {
   }
 
   addToCart(
-      {email, Map<String, dynamic> productList, productName, price}) async {
+      {email,
+      Map<String, dynamic> productList,
+      productName,
+      price,
+      image}) async {
     if (productList.containsKey(productName)) {
       productList.remove(productName);
       await _db.collection('users').doc(email).update({
@@ -126,12 +131,81 @@ class Custom_Provider extends ChangeNotifier {
         productName: {
           'price': price,
           'colors': Selectedcolors,
-          'size': Selectesize
+          'size': Selectesize,
+          'image': image
         }
       });
       await _db.collection('users').doc(email).update({
         'Cart': productList,
       });
     }
+    notifyListeners();
+  }
+
+  addToorders(
+      {Map<String, dynamic> newproductList,
+      Map<String, dynamic> oldproductList,
+      email}) async {
+    oldproductList.addAll(newproductList);
+    await _db.collection('users').doc(email).update({
+      'orders': oldproductList,
+    });
+    await _db.collection('users').doc(email).update({
+      'Cart': {},
+    });
+    notifyListeners();
+  }
+
+  DeleteItemOrders({
+    email,
+    Map<String, dynamic> productList,
+    productName,
+  }) async {
+    productList.remove(productName);
+    await _db.collection('users').doc(email).update({
+      'orders': productList,
+    });
+
+    notifyListeners();
+  }
+
+  Future<int> getCartLenght(email) async {
+    await _db.collection('users').doc(email).get().then((snapshot) {
+      Map<String, dynamic> data = snapshot.data() ?? [];
+      Map<String, dynamic> Cart = data['Cart'];
+      CartLenght = Cart.length;
+    });
+    return Future.value(CartLenght);
+  }
+
+  Future<Product> getHomeProduct() async {
+    Product product = new Product();
+    await _db
+        .collection('Products')
+        .where('homeSale', isEqualTo: true)
+        .get()
+        .then((snapshots) {
+      Map<String, dynamic> data = snapshots.docs[0].data() ?? [];
+      product = Product(
+          image: data['image'],
+          name: data['name'],
+          category: data['category'],
+          colors: data['colors'],
+          description: data['description'],
+          price: data['price'],
+          sizes: data['sizes']);
+    });
+    return Future.value(product);
+  }
+
+  enableEditMode() {
+    editMode = !editMode;
+    notifyListeners();
+  }
+
+  editeUser(name) {
+    user.updateDisplayName(name);
+    user.reload();
+    notifyListeners();
   }
 }
